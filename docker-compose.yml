@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:12-alpine
+    container_name: postgres
+    hostname: ${DB_HOST}
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+    ports:
+      - '${DB_PORT}:5432'
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+  app:
+    build: .
+    command: ["/usr/local/bin/run.sh"]
+    ports:
+      - '${PORT}:8000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - .:/code
+      - ./migrations:/app/migrations
