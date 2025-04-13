@@ -4,3 +4,4 @@ postgres-data
 test.db
 .pytest_cache
 img
+htmlcov

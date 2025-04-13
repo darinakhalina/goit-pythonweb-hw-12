@@ -42,6 +42,7 @@ caches = "^3.0.0"
 [tool.poetry.group.dev.dependencies]
 black = "^25.1.0"
 sphinx = "^8.1.3"
+httpx = "^0.28.1"
 
 
 [tool.pytest.ini_options]

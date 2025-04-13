@@ -176,3 +176,4 @@ cython_debug/
 postgres-data/
 
 test.db
+htmlcov/

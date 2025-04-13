@@ -78,15 +78,15 @@ async def login_user(
     user = await user_service.get_user_by_username(request_form.username)
 
     if not user:
-        raise HTTPUnauthorizedException()
+        raise HTTPUnauthorizedException("Incorrect login or/and password.")
 
     if not user.confirmed:
-        raise HTTPUnauthorizedException("User is not confirmed")
+        raise HTTPUnauthorizedException("User is not confirmed.")
 
     password_verified = Hash().verify_password(request_form.password, user.password)
 
     if not password_verified:
-        raise HTTPUnauthorizedException()
+        raise HTTPUnauthorizedException("Incorrect login or/and password.")
 
     await update_cached_current_user(user)
     payload = {"sub": user.username}
