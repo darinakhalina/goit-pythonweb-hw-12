@@ -6,4 +6,4 @@ docker-compose up --build
 ```
 
 ## Демо Diagram
-![Diagram](./img/diagram.png)
+![Diagram](/img/diagram.png)
