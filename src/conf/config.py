@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     MAIL_SSL_TLS: bool = True
     USE_CREDENTIALS: bool = True
     VALIDATE_CERTS: bool = True
+    REDIS_HOST: str
+    REDIS_PORT: int
 
     model_config = ConfigDict(
         extra="ignore",

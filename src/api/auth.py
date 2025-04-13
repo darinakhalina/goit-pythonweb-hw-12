@@ -1,7 +1,6 @@
-from http.client import HTTPException
-
 from fastapi import APIRouter, Depends, status, BackgroundTasks, Request
 from sqlalchemy.ext.asyncio import AsyncSession
+from src.services.cache import update_cached_current_user
 from fastapi.security import OAuth2PasswordRequestForm
 import logging
 
@@ -89,6 +88,7 @@ async def login_user(
     if not password_verified:
         raise HTTPUnauthorizedException()
 
+    await update_cached_current_user(user)
     payload = {"sub": user.username}
     access_token = await create_access_token(payload)
     return {"access_token": access_token, "token_type": "bearer"}
@@ -108,6 +108,7 @@ async def verify_email(token: str, db: AsyncSession = Depends(get_db)):
 
     await user_service.verify_email(email)
     logger.info(f"Email address {email} verified.")
+    await update_cached_current_user(user)
     return {"message": "Email has been successfully confirmed."}
 
 
@@ -122,9 +123,7 @@ async def password_reset(
     user = await user_service.get_user_by_email(body.email)
 
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
+        raise HTTPUnauthorizedException()
 
     token = create_token(payload={"sub": body.email})
 
@@ -138,6 +137,7 @@ async def password_reset(
     logger.info(
         f'Reset password email sent for a user with email address "{body.email}".'
     )
+    await update_cached_current_user(user)
     return {"message": "Reset password email sent"}
 
 

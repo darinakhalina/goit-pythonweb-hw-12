@@ -18,6 +18,18 @@ services:
       - '${DB_PORT}:5432'
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
+  redis:
+    image: redis:7-alpine
+    environment:
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   app:
     build: .
     command: ["/usr/local/bin/run.sh"]
@@ -26,6 +38,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_started
     volumes:
       - .:/code
       - ./migrations:/app/migrations

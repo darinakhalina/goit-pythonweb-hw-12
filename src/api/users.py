@@ -6,6 +6,7 @@ from src.database.db import get_db
 
 from src.schemas.users import UserBase
 from src.services.auth import get_current_user, get_current_user_admin
+from src.services.cache import update_cached_current_user
 from src.services.users import UserService
 from src.services.upload import UploadService, CloudinaryUploadService
 
@@ -29,6 +30,9 @@ async def update_avatar_user(
 ):
     upload_service = UploadService(CloudinaryUploadService())
     avatar_url = upload_service.upload_file(file, user.username)
-    user_service = UserService(db)
 
-    return await user_service.update_avatar_url(user.email, avatar_url)
+    user_service = UserService(db)
+    user = await user_service.update_avatar_url(user.email, avatar_url)
+    await update_cached_current_user(user)
+
+    return user
