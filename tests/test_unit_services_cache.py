@@ -19,7 +19,7 @@ def user():
         email="test@example.com",
         role="user",
         avatar="http://avatar.url",
-        confirmed=True
+        confirmed=True,
     )
 
 
@@ -36,10 +36,9 @@ async def test_update_cached_current_user(mock_redis, user, monkeypatch):
         "confirmed": user.confirmed,
     }
     mock_redis.set.assert_awaited_once_with(
-        f"user:{user.username}",
-        json.dumps(expected_data),
-        ex=60
+        f"user:{user.username}", json.dumps(expected_data), ex=60
     )
+
 
 @pytest.mark.asyncio
 async def test_get_cached_current_user_success(mock_redis, user, monkeypatch):
