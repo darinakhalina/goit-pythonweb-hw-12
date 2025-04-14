@@ -289,3 +289,57 @@ def test_update_contact_not_found(client, get_token):
 
     assert response.status_code == 404
     assert response.json() == {"detail": "Not found"}
+
+
+def test_delete_contact_success(client, get_token):
+    headers = {"Authorization": f"Bearer {get_token}"}
+    with patch(
+        "src.api.contacts.ContactsService.get_by_id",
+        return_value={"id": 1, "first_name": "Peter", "last_name": "Parker"},
+    ), patch("src.api.contacts.ContactsService.delete_by_id"):
+        response = client.delete("/api/contacts/1", headers=headers)
+
+    assert response.status_code == 204
+    assert response.text == ""
+
+
+def test_delete_contact_not_found(client, get_token):
+    headers = {"Authorization": f"Bearer {get_token}"}
+    with patch("src.api.contacts.ContactsService.get_by_id", return_value=None):
+        response = client.get("/api/contacts/1", headers=headers)
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Contact not found"}
+
+
+def test_delete_not_found(client, get_token):
+    headers = {"Authorization": f"Bearer {get_token}"}
+    with patch("src.api.contacts.ContactsService.delete_by_id", return_value=None):
+        response = client.get("/api/contacts/12345678", headers=headers)
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Not found"}
+
+
+def test_delete_contact_db_error(client, get_token):
+    headers = {"Authorization": f"Bearer {get_token}"}
+    with patch(
+        "src.api.contacts.ContactsService.get_by_id",
+        side_effect=SQLAlchemyError("DB Error"),
+    ):
+        response = client.delete("/api/contacts/1", headers=headers)
+
+    assert response.status_code == 500
+    assert response.json() == {"detail": "DB Error"}
+
+
+def test_delete_contact_unexpected_error(client, get_token):
+    headers = {"Authorization": f"Bearer {get_token}"}
+    with patch(
+        "src.api.contacts.ContactsService.get_by_id",
+        side_effect=Exception("Something went wrong"),
+    ):
+        response = client.delete("/api/contacts/1", headers=headers)
+
+    assert response.status_code == 500
+    assert response.json() == {"detail": "Something went wrong"}

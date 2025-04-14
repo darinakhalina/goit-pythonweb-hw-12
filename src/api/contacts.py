@@ -137,7 +137,6 @@ async def delete_contact_by_id(
 
         await contacts_service.delete_by_id(contact_id)
         return Response(status_code=status.HTTP_204_NO_CONTENT)
-
     except SQLAlchemyError as e:
         raise HTTPInternalDatabaseException(str(e))
     except Exception as e:
