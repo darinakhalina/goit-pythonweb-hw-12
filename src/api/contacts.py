@@ -2,6 +2,7 @@ from typing import List
 from fastapi import APIRouter, Query, Depends, status, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
+from fastapi import HTTPException
 
 from src.database.db import get_db
 from src.services.contacts import ContactsService
@@ -71,6 +72,8 @@ async def get_contact_by_id(
         if contact is None:
             raise HTTPNotFoundException("Contact not found")
         return contact
+    except HTTPException as e:
+        raise e
     except SQLAlchemyError as e:
         raise HTTPInternalDatabaseException(str(e))
     except Exception as e:
@@ -110,8 +113,6 @@ async def update_contact_by_id(
     try:
         contacts_service = ContactsService(db, user)
         contact = await contacts_service.update_by_id(contact_id, body)
-        if contact is None:
-            raise HTTPNotFoundException("Contact not found")
         return contact
     except SQLAlchemyError as e:
         raise HTTPInternalDatabaseException(str(e))
