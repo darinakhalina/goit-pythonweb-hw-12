@@ -111,7 +111,10 @@ async def test_create(contacts_repository, mock_session):
 @pytest.mark.asyncio
 async def test_update(contacts_repository, mock_session, user):
     contact_data = ContactUpdate(
-        first_name="Updated Test", last_name="Mock", email="test@example.com", phone="1111"
+        first_name="Updated Test",
+        last_name="Mock",
+        email="test@example.com",
+        phone="1111",
     )
     existing_contact = Contact(
         id=1,
@@ -154,6 +157,7 @@ async def test_delete(contacts_repository, mock_session, user):
     mock_session.delete.assert_awaited_once_with(existing_tag)
     mock_session.commit.assert_awaited_once()
 
+
 @pytest.mark.asyncio
 async def test_get_all_birthdays_within_days_same_year():
     contacts = [
@@ -171,12 +175,14 @@ async def test_get_all_birthdays_within_days_same_year():
         week_mmdd = week.strftime("%m-%d")
 
         filtered = [
-            c for c in contacts
+            c
+            for c in contacts
             if today_mmdd <= c.birthday.strftime("%m-%d") <= week_mmdd
         ]
         mock_result = MagicMock()
         mock_result.scalars.return_value.all.return_value = filtered
         return mock_result
+
     mock_session.execute = AsyncMock(side_effect=mock_execute)
     repo = ContactsRepository(mock_session, user)
 
@@ -186,6 +192,7 @@ async def test_get_all_birthdays_within_days_same_year():
 
     assert len(result) == 2
     assert {c.first_name for c in result} == {"John", "Jane"}
+
 
 @pytest.mark.asyncio
 async def test_get_all_with_skip():
@@ -211,6 +218,7 @@ async def test_get_all_with_skip():
     assert len(result) == 2
     assert {c.first_name for c in result} == {"Jane", "Alice"}
 
+
 @pytest.mark.asyncio
 async def test_get_all_with_limit():
     contacts = [
@@ -235,6 +243,7 @@ async def test_get_all_with_limit():
     assert len(result) == 2
     assert {c.first_name for c in result} == {"John", "Jane"}
 
+
 @pytest.mark.asyncio
 async def test_get_all_birthdays_across_new_year():
     contacts = [
@@ -252,8 +261,10 @@ async def test_get_all_birthdays_across_new_year():
         week_mmdd = week.strftime("%m-%d")
 
         filtered = [
-            c for c in contacts
-            if c.birthday.strftime("%m-%d") >= today_mmdd or c.birthday.strftime("%m-%d") <= week_mmdd
+            c
+            for c in contacts
+            if c.birthday.strftime("%m-%d") >= today_mmdd
+            or c.birthday.strftime("%m-%d") <= week_mmdd
         ]
         mock_result = MagicMock()
         mock_result.scalars.return_value.all.return_value = filtered
