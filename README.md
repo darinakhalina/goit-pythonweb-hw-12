@@ -20,3 +20,10 @@ pytest --cov=src tests/ --cov-report=html
 ```
 
 ![Tests](/img/tests.png)
+
+## Docs
+```bash
+сd docs
+
+make html
+```

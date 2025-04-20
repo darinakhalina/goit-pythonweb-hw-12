@@ -44,6 +44,18 @@ async def register_user(
     request: Request,
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Register a new User and send a confirmation email.
+
+    Args:
+        user (UserCreate): The user data for registration, including username, email, and password.
+        background_tasks (BackgroundTasks): Used to send the confirmation email asynchronously.
+        request (Request): The request object used to extract the base URL.
+        db (AsyncSession): The database session used to interact with the database.
+
+    Returns:
+        UserBase: The created User with their details, including the username and email.
+    """
     user_service = UserService(db)
     email_user = await user_service.get_user_by_email(user.email)
 
@@ -74,6 +86,16 @@ async def login_user(
     request_form: OAuth2PasswordRequestForm = Depends(),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Authenticate a User and return a JWT token.
+
+    Args:
+        request_form (OAuth2PasswordRequestForm): The login form containing username and password.
+        db (AsyncSession): The database session dependency.
+
+    Returns:
+        dict: A dictionary containing the access token and token type.
+    """
     user_service = UserService(db)
     user = await user_service.get_user_by_username(request_form.username)
 
@@ -96,6 +118,18 @@ async def login_user(
 
 @router.get("/verify_email/{token}")
 async def verify_email(token: str, db: AsyncSession = Depends(get_db)):
+    """
+    Verify the User's email using a token.
+
+    Args:
+        token (str): The verification token sent to the user's email.
+        db (AsyncSession): The database session used to interact with the database.
+
+    Returns:
+        dict: A message indicating the result of the verification process:
+            - "Email is already confirmed." if the email was previously verified.
+            - "Email has been successfully confirmed." upon successful verification.
+    """
     email = await get_email_from_token(token)
     user_service = UserService(db)
     user = await user_service.get_user_by_email(email)
@@ -119,6 +153,18 @@ async def password_reset(
     request: Request,
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Initiate a password reset process by sending a reset link to the User's email.
+
+    Args:
+        body (ResetPasswordRequest): The request body containing the email of the user requesting the password reset.
+        background_tasks (BackgroundTasks): Used to send the reset email in the background.
+        request (Request): The request object to get the base URL for the reset link.
+        db (AsyncSession): The database session used to interact with the database.
+
+    Returns:
+        dict: A message indicating that the password reset email has been sent.
+    """
     user_service = UserService(db)
     user = await user_service.get_user_by_email(body.email)
 
@@ -146,6 +192,16 @@ async def password_reset_confirm(
     data: ResetPasswordConfirm,
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Confirm the password reset by validating the token and updating the User's password.
+
+    Args:
+        data (ResetPasswordConfirm): The request body containing the token and the new password.
+        db (AsyncSession): The database session used to interact with the database.
+
+    Returns:
+        dict: A message indicating that the password has been successfully updated.
+    """
     user_service = UserService(db)
     email = await get_email_from_token(data.token)
     user = await user_service.get_user_by_email(email)
