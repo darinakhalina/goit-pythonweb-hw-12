@@ -22,6 +22,18 @@ class ContactsRepository:
         skip: int | None = None,
         limit: int | None = None,
     ):
+        """
+        Retrieve all Contacts, with optional filters for search, birthdays, and pagination.
+
+        Args:
+            birthdays_within_days (int, optional): The number of upcoming days to filter contacts with birthdays.
+            search (str, optional): A search term to filter contacts by first name, last name, or email.
+            skip (int, optional): The number of records to skip for pagination.
+            limit (int, optional): The maximum number of records to retrieve.
+
+        Returns:
+            list: A list of Contacts matching the filter criteria.
+        """
         stmt = select(Contact)
 
         if search is not None:
@@ -67,6 +79,15 @@ class ContactsRepository:
         self,
         email: str,
     ) -> Contact | None:
+        """
+        Retrieve a contact by Email for the current user.
+
+        Args:
+            email (str): The email address of the contact to retrieve.
+
+        Returns:
+            Contact | None: The contact associated with the provided email for the current user, or None if no such contact exists.
+        """
         return (
             await self.db.execute(
                 select(Contact).filter(
@@ -79,6 +100,15 @@ class ContactsRepository:
         self,
         contact_id: int,
     ) -> Contact | None:
+        """
+        Retrieve a Contact by its ID for the current user.
+
+        Args:
+            contact_id (int): The ID of the contact to retrieve.
+
+        Returns:
+            Contact | None: The Contact associated with the provided ID for the current user, or None if no such contact exists.
+        """
         return (
             await self.db.execute(
                 select(Contact).filter(
@@ -88,6 +118,15 @@ class ContactsRepository:
         ).scalar_one_or_none()
 
     async def create(self, body: ContactBase):
+        """
+        Create a new Contact for the current user.
+
+        Args:
+            body (ContactBase): The data used to create a new contact, encapsulated in the ContactBase schema.
+
+        Returns:
+            Contact: The created Contact with all its details, including any generated fields like ID.
+        """
         contact = Contact(**body.model_dump(), user_id=self.current_user.id)
         self.db.add(contact)
         await self.db.commit()
@@ -95,6 +134,16 @@ class ContactsRepository:
         return contact
 
     async def update(self, contact_id: int, body: ContactUpdate):
+        """
+        Update an existing Contact's details.
+
+        Args:
+            contact_id (int): The ID of the contact to be updated.
+            body (ContactUpdate): The data containing the updated values for the contact.
+
+        Returns:
+            Contact: The updated Contact with its new details.
+        """
         contact = await self.get_contact_by_id(contact_id)
 
         if contact:
@@ -106,6 +155,17 @@ class ContactsRepository:
             return contact
 
     async def delete(self, contact_id: int):
+        """
+        Delete a contact by its ID.
+
+        Args:
+            contact_id (int): The ID of the contact to be deleted.
+
+        Returns:
+            Contact: The deleted contact.
+            If the contact does not exist, this method will return `None`, and it is expected
+            that the caller will handle the case where the contact does not exist.
+        """
         contact = await self.get_contact_by_id(contact_id)
 
         if contact:
