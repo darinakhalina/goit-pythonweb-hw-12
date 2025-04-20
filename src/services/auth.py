@@ -107,7 +107,7 @@ async def get_current_user(
 
     cached_user = await get_cached_current_user(username)
     if cached_user:
-        logger.info(f'Get user data from cache - "{cached_user}".')
+        logger.info(f'Get user data from cache - "{cached_user.username}".')
         return cached_user
 
     logger.info(f'Search for user data "{username}" in db.')

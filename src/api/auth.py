@@ -142,7 +142,6 @@ async def verify_email(token: str, db: AsyncSession = Depends(get_db)):
 
     await user_service.verify_email(email)
     logger.info(f"Email address {email} verified.")
-    await update_cached_current_user(user)
     return {"message": "Email has been successfully confirmed."}
 
 
