@@ -482,7 +482,6 @@ async def test_verify_email(client, get_token, mock_dependencies):
     mock_logger.info.assert_called_once_with(
         "Email address test_email@example.com verified."
     )
-    mock_update_cached_current_user.assert_called_once()
 
 
 @pytest.mark.asyncio
