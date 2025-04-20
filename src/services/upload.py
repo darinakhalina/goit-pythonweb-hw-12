@@ -22,6 +22,16 @@ class CloudinaryUploadService(BasicUploadService):
         )
 
     def upload_file(self, file, username) -> str:
+        """
+        Uploads a file to Cloudinary and returns a secure URL for the uploaded file.
+
+        Args:
+            file (UploadFile): The file to be uploaded.
+            username (str): The username to be used in the Cloudinary public ID.
+
+        Returns:
+            str: A secure URL of the uploaded file.
+        """
         public_id = f"RestApp/{username}"
         r = cloudinary.uploader.upload(file.file, public_id=public_id, overwrite=True)
         src_url = cloudinary.CloudinaryImage(public_id).build_url(

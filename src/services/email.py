@@ -23,6 +23,14 @@ conf = ConnectionConfig(
 
 
 async def send_email(email: str, username: str, host: str):
+    """
+    Sends an email to the specified recipient for email verification.
+
+    Args:
+        email (str): The email address of the recipient.
+        username (str): The username of the recipient.
+        host (str): The host URL to include in the verification email template.
+    """
     try:
         token_verification = create_token(payload={"sub": email})
         message = MessageSchema(
@@ -43,6 +51,14 @@ async def send_email(email: str, username: str, host: str):
 
 
 async def send_reset_email(email: str, token: str, host: str):
+    """
+    Sends a password reset email to the specified recipient.
+
+    Args:
+        email (str): The email address of the recipient.
+        token (str): The password reset token.
+        host (str): The host URL to include in the reset email template.
+    """
     try:
         token = create_token(payload={"sub": email})
         message = MessageSchema(

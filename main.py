@@ -20,6 +20,16 @@ app.add_middleware(
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(_: Request, exc: ValidationError):
+    """
+    Uncaught validation error handler.
+
+    Args:
+        _ (Request): The incoming request.
+        exc (ValidationError): An instance of the raised ValidationError.
+
+    Returns:
+        JSONResponse: A JSON response containing the error details.
+    """
     return JSONResponse(
         status_code=400,
         content={
