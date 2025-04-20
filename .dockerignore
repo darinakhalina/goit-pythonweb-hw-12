@@ -5,3 +5,5 @@ test.db
 .pytest_cache
 img
 htmlcov
+fly.toml
+**/.env
