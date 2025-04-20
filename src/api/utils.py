@@ -13,6 +13,15 @@ router = APIRouter(tags=["utils"])
 
 @router.get("/healthchecker")
 async def healthchecker(db: AsyncSession = Depends(get_db)):
+    """
+    Check the health status of the database and FastAPI server.
+
+    Args:
+        db (AsyncSession): The database session used to execute a simple query.
+
+    Returns:
+        dict: A dictionary containing a success message if the database is accessible.
+    """
     try:
         result = await db.execute(text("SELECT 1"))
         result = result.scalar_one_or_none()
