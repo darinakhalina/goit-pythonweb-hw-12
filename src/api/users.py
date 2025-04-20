@@ -19,6 +19,16 @@ limiter = Limiter(key_func=get_remote_address)
 )
 @limiter.limit("10/minute")
 async def me(request: Request, user: UserBase = Depends(get_current_user)):
+    """
+    Get the details of the currently authenticated User.
+
+    Args:
+        request (Request): The request object, used to access request-related data.
+        user (UserBase): The currently authenticated user, provided via dependency injection.
+
+    Returns:
+        UserBase: The details of the authenticated User.
+    """
     return user
 
 
@@ -28,6 +38,17 @@ async def update_avatar_user(
     user: UserBase = Depends(get_current_user_admin),
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    Update the avatar of the currently authenticated user.
+
+    Args:
+        file (UploadFile): The avatar image file to be uploaded.
+        user (UserBase): The currently authenticated admin user, provided via dependency injection.
+        db (AsyncSession): The database session used to update user information.
+
+    Returns:
+        UserBase: The updated user with the new avatar URL.
+    """
     upload_service = UploadService(CloudinaryUploadService())
     avatar_url = upload_service.upload_file(file, user.username)
 
