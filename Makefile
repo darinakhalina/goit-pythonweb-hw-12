@@ -15,3 +15,6 @@ test-cov:
 
 test-html:
 	pytest --cov=src tests/ --cov-report=html
+
+format:
+	black .
