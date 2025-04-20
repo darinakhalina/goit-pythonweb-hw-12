@@ -43,6 +43,20 @@ async def get_contacts(
     db: AsyncSession = Depends(get_db),
     user: UserBase = Depends(get_current_user),
 ):
+    """
+    Retrieve a list of Contacts, with optional filters for search, birthdays, pagination, and user authentication.
+
+    Args:
+        search (str, optional): A filter for searching contacts by their first name, last name, or email.
+        birthdays_within_days (int, optional): Find contacts whose birthdays are within the given number of upcoming days.
+        skip (int, optional): The number of records to skip from the beginning.
+        limit (int, optional): The maximum number of records to retrieve.
+        db (AsyncSession): The database session used to interact with the database.
+        user (UserBase): The current authenticated user.
+
+    Returns:
+        List[ContactResponse]: A list of contacts matching the given filters.
+    """
     try:
         contacts_service = ContactsService(db, user)
         return await contacts_service.get_all(
@@ -66,6 +80,17 @@ async def get_contact_by_id(
     db: AsyncSession = Depends(get_db),
     user: UserBase = Depends(get_current_user),
 ):
+    """
+    Retrieve a Contact by its ID.
+
+    Args:
+        contact_id (int): The ID of the contact to retrieve.
+        db (AsyncSession): The database session used to interact with the database.
+        user (UserBase): The current authenticated user.
+
+    Returns:
+        ContactResponse: The contact details for the given contact ID.
+    """
     try:
         contacts_service = ContactsService(db, user)
         contact = await contacts_service.get_by_id(contact_id)
@@ -90,6 +115,17 @@ async def create_contact(
     db: AsyncSession = Depends(get_db),
     user: UserBase = Depends(get_current_user),
 ):
+    """
+    Create a new Contact.
+
+    Args:
+        body (ContactBase): The data for the new contact.
+        db (AsyncSession): The database session used to interact with the database.
+        user (UserBase): The current authenticated user.
+
+    Returns:
+        ContactResponse: The details of the newly created contact.
+    """
     try:
         contacts_service = ContactsService(db, user)
         return await contacts_service.create(body)
@@ -110,6 +146,18 @@ async def update_contact_by_id(
     db: AsyncSession = Depends(get_db),
     user: UserBase = Depends(get_current_user),
 ):
+    """
+    Update an existing Contact by its ID.
+
+    Args:
+        body (ContactUpdate): The data to update the contact with.
+        contact_id (int): The ID of the contact to update.
+        db (AsyncSession): The database session used to interact with the database.
+        user (UserBase): The current authenticated user.
+
+    Returns:
+        ContactResponse: The updated contact details.
+    """
     try:
         contacts_service = ContactsService(db, user)
         contact = await contacts_service.update_by_id(contact_id, body)
@@ -129,6 +177,17 @@ async def delete_contact_by_id(
     db: AsyncSession = Depends(get_db),
     user: UserBase = Depends(get_current_user),
 ):
+    """
+    Delete a Contact by its ID.
+
+    Args:
+        contact_id (int): The ID of the contact to delete.
+        db (AsyncSession): The database session used to interact with the database.
+        user (UserBase): The current authenticated user.
+
+    Returns:
+        Response: A response with status code 204 (No Content) indicating successful deletion.
+    """
     try:
         contacts_service = ContactsService(db, user)
         contact = await contacts_service.get_by_id(contact_id)
