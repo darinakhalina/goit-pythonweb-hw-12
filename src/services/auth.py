@@ -37,6 +37,17 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 
 async def create_access_token(payload: dict, expires_delta: Optional[int] = None):
+    """
+    Create a JWT access token.
+
+    Args:
+        payload (dict): The payload to include in the JWT, typically containing user identification data (e.g., email, user ID).
+        expires_delta (Optional[int]): The expiration time in seconds for the token. If not provided, the default expiration
+        time from settings will be used.
+
+    Returns:
+        str: The encoded JWT access token.
+    """
     payload_data = payload.copy()
     if expires_delta:
         expire = datetime.now(UTC) + timedelta(seconds=expires_delta)
@@ -52,6 +63,16 @@ async def create_access_token(payload: dict, expires_delta: Optional[int] = None
 
 
 def create_token(payload: dict):
+    """
+    Create a JWT token with a 7-day expiration.
+
+    Args:
+        payload (dict): A dictionary containing the data to encode in the JWT.
+        This typically includes identifying information such as user ID or email.
+
+    Returns:
+        str: A JWT token as a string.
+    """
     to_encode = payload.copy()
     expire = datetime.now(UTC) + timedelta(days=7)
     to_encode.update({"iat": datetime.now(UTC), "exp": expire})
@@ -62,6 +83,16 @@ def create_token(payload: dict):
 async def get_current_user(
     token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
 ):
+    """
+    Retrieve the currently authenticated user from the JWT token.
+
+    Args:
+        token (str): A JWT token automatically extracted from the Authorization header by FastAPI's `oauth2_scheme`.
+        db (AsyncSession): SQLAlchemy asynchronous database session (injected via dependency).
+
+    Returns:
+        User: The user object corresponding to the username in the token payload.
+    """
     credentials_exception = HTTPUnauthorizedException("Could not validate credentials")
 
     try:
@@ -90,12 +121,30 @@ async def get_current_user(
 
 
 def get_current_user_admin(current_user: User = Depends(get_current_user)):
+    """
+    Dependency that ensures the current user has admin privileges.
+
+    Args:
+        current_user (User): The currently authenticated user, injected via `get_current_user`.
+
+    Returns:
+        User: The same user object if they have admin rights.
+    """
     if current_user.role != UserRole.ADMIN:
         raise HTTPException(status_code=403, detail="Permission Denided")
     return current_user
 
 
 async def get_email_from_token(token: str):
+    """
+    Decodes a JWT token and extracts the email from its payload.
+
+    Args:
+        token (str): The JWT token to decode.
+
+    Returns:
+        str: The email extracted from the token's "sub" claim.
+    """
     try:
         payload = jwt.decode(
             token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM]
