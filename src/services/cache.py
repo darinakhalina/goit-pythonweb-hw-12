@@ -14,6 +14,15 @@ redis_client = redis.Redis(
 
 
 async def update_cached_current_user(user: User) -> None:
+    """
+    Caches the current user's data in Redis.
+
+    Args:
+        user (User): The user object containing user data to cache.
+
+    Returns:
+        None
+    """
     user_data = {
         "id": user.id,
         "username": user.username,
@@ -27,6 +36,15 @@ async def update_cached_current_user(user: User) -> None:
 
 
 async def get_cached_current_user(username: str) -> Optional[User]:
+    """
+    Retrieves cached user data from Redis based on the provided username.
+
+    Args:
+        username (str): The username used as the Redis cache key.
+
+    Returns:
+        Optional[User]: A User object if found and successfully decoded, otherwise None.
+    """
     user_data = await redis_client.get(f"user:{username}")
 
     if user_data:
